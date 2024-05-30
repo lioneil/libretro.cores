@@ -24,7 +24,7 @@ on:
       environment:
         description: 'Environment to run manually against'
         type: environment
-        required: true
+        required: false
 
 jobs:
   Linux:
