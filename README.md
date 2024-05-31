@@ -8,7 +8,7 @@ All supported cores can be downloaded from the [Releases](https://github.com/lio
 
 | Core | Download |
 | ---- | :------- |
-| FBNeo | [![FBNeo libretro Linux aarch64](https://github.com/lioneil/libretro.cores/actions/workflows/fbneo-libretro.yml/badge.svg?branch=main)](https://github.com/lioneil/libretro.cores/actions/workflows/fbneo-libretro.yml) |
+| FBNeo | [![FBNeo libretro Linux aarch64](https://github.com/lioneil/libretro.cores/actions/workflows/fbneo-libretro.yml/badge.svg?branch=main)](https://github.com/lioneil/libretro.cores/releases/download/Linux_aarch64/fbneo_libretro.so.zip) |
 
 ## RetroArch Core Settings
 
