@@ -6,8 +6,8 @@ A repository for pre-built 64-bit linux (arm64 or aarch64) RetroArch Libretro Co
 
 All supported cores can be downloaded from the [Releases](https://github.com/lioneil/libretro.cores/releases) section or directly from the table below.
 
-| Core | Download |
-| :--- | :------- |
+| Core | Nightly builds |
+| :--- | :------------- |
 | FBNeo | [![FBNeo libretro Linux aarch64](https://github.com/lioneil/libretro.cores/actions/workflows/fbneo-libretro.yml/badge.svg?branch=main)](https://github.com/lioneil/libretro.cores/releases/download/Linux_aarch64/fbneo_libretro.so.zip) |
 
 ## RetroArch Core Settings
