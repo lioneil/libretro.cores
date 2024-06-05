@@ -6,25 +6,6 @@ on:
   watch: # this is a hack that lets repo owners trigger a build by starring
     types: [started]
     if: github.actor == github.event.repository.owner.login
-  workflow_dispatch:
-      inputs:
-        logLevel:
-          description: 'Log level'
-          required: true
-          default: 'warning'
-          type: choice
-          options:
-          - info
-          - warning
-          - debug
-        tags:
-          description: 'Manually triggered run'
-          required: false
-          type: boolean
-        environment:
-          description: 'Environment to run manually against'
-          type: environment
-          required: false
 
 jobs:
   Linux:
@@ -57,7 +38,7 @@ jobs:
     - name: Build libretro core
       working-directory: flycast
       run: |
-        mkdir build && cd build && cmake .. -DLIBRETRO=ON -DUSE_GLES2=ON -DCMAKE_C_COMPILER=/usr/bin/aarch64-linux-gnu-gcc -DCMAKE_CXX_COMPILER=/usr/bin/aarch64-linux-gnu-g++ -DUSE_EGL=ON
+        mkdir build && cd build && cmake .. -DLIBRETRO=ON -DUSE_GLES=ON -DUSE_GLES2=OFF -DCMAKE_C_COMPILER=/usr/bin/aarch64-linux-gnu-gcc -DCMAKE_CXX_COMPILER=/usr/bin/aarch64-linux-gnu-g++ -DUSE_EGL=ON
         make -j8
         wget https://raw.githubusercontent.com/libretro/libretro-super/master/retrolink.sh && chmod +x retrolink.sh && ./retrolink.sh flycast_libretro.so
         zip -9 ../../flycast_libretro.so.zip flycast_libretro.so
