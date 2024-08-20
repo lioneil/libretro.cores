@@ -15,7 +15,7 @@ All supported cores can be downloaded from the [Releases](https://github.com/lio
 
 While not recommended, you can make this repository your main source of cores.
 
-> ⚠️ Note: The cores in this repository are few and caters to a select curation of supported systems for a retro handheld device.
+> ⚠️ Note: The cores in this repository are limited and cater to a curated selection of supported systems for a retro handheld device.
 
 In RetroArch, go to Online Updater > Updater Settings and change value for Buildbot Cores URL to:
 
