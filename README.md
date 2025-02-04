@@ -23,7 +23,7 @@ For example, in RetroArch I can go the the RetroArch GUI application Settings > 
 /home/[username]/.config/retroarch/cores
 ```
 
-Simply copy the files over in this directory and restart retroarch.
+Simply unzip and copy the file(s) over in the directory and restart retroarch.
 
 ## RetroArch Core Settings
 
