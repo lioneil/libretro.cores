@@ -11,11 +11,25 @@ All supported cores can be downloaded from the [Releases](https://github.com/lio
 | FBNeo | [![FBNeo libretro Linux aarch64](https://github.com/lioneil/libretro.cores/actions/workflows/fbneo-libretro.yml/badge.svg?branch=main)](https://github.com/lioneil/libretro.cores/releases/download/Linux_aarch64/fbneo_libretro.so.zip) |
 | Flycast | [![Flycast libretro Linux aarch64](https://github.com/lioneil/libretro.cores/actions/workflows/flycast-libretro.yml/badge.svg?branch=main)](https://github.com/lioneil/libretro.cores/releases/download/Linux_aarch64/flycast_libretro.so.zip) |
 
+## Installation and Download
+
+Download the nightly builds from the above table or from the [Releases](https://github.com/lioneil/libretro.cores/releases) section.
+
+Then from your Retro Pie or console or wherever you need the build, simply copy it into the libretro cores folder of your system.
+
+For example, in RetroArch I can go the the RetroArch GUI application Settings > Directory > Cores, and it will provide me the path, something like:
+
+```
+/home/[username]/.config/retroarch/cores
+```
+
+Simply copy the files over in this directory and restart retroarch.
+
 ## RetroArch Core Settings
 
 While not recommended, you can make this repository your main source of cores.
 
-> ⚠️ Note: The cores in this repository are limited and cater to a curated selection of supported systems for a retro handheld device.
+> ⚠️ Note: The cores in this repository are incomplete and limited to cater to a curated selection of supported systems for a retro handheld device.
 
 In RetroArch, go to Online Updater > Updater Settings and change value for Buildbot Cores URL to:
 
