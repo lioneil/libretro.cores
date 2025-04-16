@@ -29,7 +29,7 @@ on:
 jobs:
   Linux:
     name: Build for Linux
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
 
     steps:
     - name: add foreign arch
