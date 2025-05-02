@@ -36,8 +36,8 @@ jobs:
       run: |
         sudo dpkg --add-architecture arm64
         sudo rm -rf /etc/apt/sources.list
-        echo "deb [arch=amd64] http://archive.ubuntu.com/ubuntu focal main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list
-        echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports focal main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list
+        echo "deb [arch=amd64] http://archive.ubuntu.com/ubuntu jammy main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list
+        echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports jammy main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list
         sudo apt update
 
     - name: Install needed packages
