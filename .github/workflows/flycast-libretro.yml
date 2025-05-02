@@ -49,7 +49,7 @@ jobs:
 
     - name: Install needed packages
       run: |
-        sudo apt install -y wget:amd64 git:amd64 build-essential gcc:amd64 make:amd64 g++-aarch64-linux-gnu:amd64 gcc-aarch64-linux-gnu:amd64 yasm:amd64 binutils-aarch64-linux-gnu:amd64
+        sudo apt install -y wget:amd64 git:amd64 build-essential gcc:amd64 make:amd64 g++-aarch64-linux-gnu:amd64 gcc-aarch64-linux-gnu:amd64 yasm:amd64 binutils-aarch64-linux-gnu:amd64 libgles-dev:arm64
 
     - name: Checkout source
       run: git clone https://github.com/flyinghead/flycast.git && cd flycast && git submodule update --init --recursive
