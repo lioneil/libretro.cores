@@ -6,14 +6,14 @@ A repository for pre-built 64-bit linux (arm64 or aarch64) RetroArch Libretro Co
 
 All supported cores can be downloaded from the [Releases](https://github.com/lioneil/libretro.cores/releases) section or directly from the table below.
 
-| Core | Nightly builds |
+| Core | Monthly builds |
 | :--- | :------------- |
 | FBNeo | [![FBNeo libretro Linux aarch64](https://github.com/lioneil/libretro.cores/actions/workflows/fbneo-libretro.yml/badge.svg?branch=main)](https://github.com/lioneil/libretro.cores/releases/download/Linux_aarch64/fbneo_libretro.so.zip) |
 | Flycast | [![Flycast libretro Linux aarch64](https://github.com/lioneil/libretro.cores/actions/workflows/flycast-libretro.yml/badge.svg?branch=main)](https://github.com/lioneil/libretro.cores/releases/download/Linux_aarch64/flycast_libretro.so.zip) |
 
 ## Installation and Download
 
-Download the nightly builds from the above table or from the [Releases](https://github.com/lioneil/libretro.cores/releases) section.
+Download the monthly builds from the above table or from the [Releases](https://github.com/lioneil/libretro.cores/releases) section.
 
 Then from your Retro Pie or console or wherever you need the build, simply copy it into the libretro cores folder of your system.
 

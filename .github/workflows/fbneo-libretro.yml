@@ -2,10 +2,7 @@ name: FBNeo libretro Linux aarch64
 
 on:
   schedule:
-    - cron: '0 2 * * *'
-  watch:
-    types: [started]
-    if: github.actor == github.event.repository.owner.login
+    - cron: '0 2 1 * *'
   workflow_dispatch:
     inputs:
       logLevel:
