@@ -40,7 +40,7 @@ jobs:
         zip -9 ../../../../fbneo_libretro.so.zip fbneo_libretro.so
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: fbneo
         path: fbneo_libretro.so.zip
@@ -83,7 +83,7 @@ jobs:
         zip -9 ../../flycast_libretro.so.zip flycast_libretro.so
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: flycast
         path: flycast_libretro.so.zip
@@ -101,7 +101,7 @@ jobs:
 
     steps:
     - name: Download artifacts
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v8
       with:
         path: dist
         merge-multiple: true
