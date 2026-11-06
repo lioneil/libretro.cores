@@ -5,10 +5,15 @@ on:
     - cron: '0 2 1 * *' # run at 2 AM UTC on the 1st of each month
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   fbneo:
     name: Build FBNeo
     runs-on: ubuntu-22.04
+    outputs:
+      sha: ${{ steps.checkout.outputs.sha }}
 
     steps:
     - name: add foreign arch
@@ -30,14 +35,17 @@ jobs:
       run: sudo apt install -y wget:amd64 git:amd64 build-essential gcc:amd64 make:amd64 g++-aarch64-linux-gnu:amd64 gcc-aarch64-linux-gnu:amd64 binutils-aarch64-linux-gnu:amd64
 
     - name: Checkout source
-      run: git clone https://github.com/libretro/FBNeo.git && cd FBNeo && git submodule update --init
+      id: checkout
+      run: |
+        git clone https://github.com/libretro/FBNeo.git && cd FBNeo && git submodule update --init
+        echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
     - name: Build libretro core
       working-directory: FBNeo/src/burner/libretro
       run: |
         make -j8 CC=/usr/bin/aarch64-linux-gnu-gcc CXX=/usr/bin/aarch64-linux-gnu-g++
-        wget https://raw.githubusercontent.com/libretro/libretro-super/master/retrolink.sh && chmod +x retrolink.sh && ./retrolink.sh fbneo_libretro.so
-        zip -9 ../../../../fbneo_libretro.so.zip fbneo_libretro.so
+        wget https://raw.githubusercontent.com/libretro/libretro-super/80890aa075096277725bc41f765c48ab88d83d20/retrolink.sh && chmod +x retrolink.sh && ./retrolink.sh fbneo_libretro.so
+        zip -9 -j ../../../../fbneo_libretro.so.zip fbneo_libretro.so ../../license.txt
 
     - name: Upload artifact
       uses: actions/upload-artifact@v7
@@ -49,6 +57,8 @@ jobs:
   flycast:
     name: Build Flycast
     runs-on: ubuntu-22.04
+    outputs:
+      sha: ${{ steps.checkout.outputs.sha }}
 
     steps:
     - name: add foreign arch
@@ -71,7 +81,10 @@ jobs:
         sudo apt install -y wget:amd64 git:amd64 build-essential gcc:amd64 make:amd64 g++-aarch64-linux-gnu:amd64 gcc-aarch64-linux-gnu:amd64 yasm:amd64 binutils-aarch64-linux-gnu:amd64 libgles-dev:arm64
 
     - name: Checkout source
-      run: git clone https://github.com/flyinghead/flycast.git && cd flycast && git submodule update --init --recursive
+      id: checkout
+      run: |
+        git clone https://github.com/flyinghead/flycast.git && cd flycast && git submodule update --init --recursive
+        echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
     - name: Build libretro core
       working-directory: flycast
@@ -79,8 +92,8 @@ jobs:
         mkdir build && cd build
         cmake .. -DLIBRETRO=ON -DUSE_GLES=ON -DUSE_GLES2=OFF -DCMAKE_C_COMPILER=/usr/bin/aarch64-linux-gnu-gcc -DCMAKE_CXX_COMPILER=/usr/bin/aarch64-linux-gnu-g++
         make -j8
-        wget https://raw.githubusercontent.com/libretro/libretro-super/master/retrolink.sh && chmod +x retrolink.sh && ./retrolink.sh flycast_libretro.so
-        zip -9 ../../flycast_libretro.so.zip flycast_libretro.so
+        wget https://raw.githubusercontent.com/libretro/libretro-super/80890aa075096277725bc41f765c48ab88d83d20/retrolink.sh && chmod +x retrolink.sh && ./retrolink.sh flycast_libretro.so
+        zip -9 -j ../../flycast_libretro.so.zip flycast_libretro.so ../LICENSE
 
     - name: Upload artifact
       uses: actions/upload-artifact@v7
@@ -95,9 +108,12 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      actions: write
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       GH_REPO: ${{ github.repository }}
+      FBNEO_SHA: ${{ needs.fbneo.outputs.sha }}
+      FLYCAST_SHA: ${{ needs.flycast.outputs.sha }}
 
     steps:
     - name: Download artifacts
@@ -115,7 +131,12 @@ jobs:
         gh release create "$TAG" dist/fbneo_libretro.so.zip dist/flycast_libretro.so.zip \
           --target "$GITHUB_SHA" \
           --title "$TAG" \
-          --notes "FBNeo and Flycast built from latest upstream source" \
+          --notes "Built from upstream source:
+
+        - FBNeo: https://github.com/libretro/FBNeo/tree/$FBNEO_SHA
+        - Flycast: https://github.com/flyinghead/flycast/tree/$FLYCAST_SHA
+
+        Each core is distributed under its upstream licence: FBNeo's non-commercial licence and Flycast's GPLv2." \
           --latest
 
     - name: Prune old releases
@@ -125,3 +146,8 @@ jobs:
         while read -r tag; do
           gh release delete "$tag" --cleanup-tag --yes
         done
+
+    # In public repositories GitHub disables scheduled workflows after 60 days
+    # without repository activity. Re-enabling the workflow resets that timer.
+    - name: Keep schedule enabled
+      run: gh api -X PUT "repos/$GH_REPO/actions/workflows/build-cores.yml/enable"
