@@ -1,0 +1,127 @@
+name: Build libretro cores Linux aarch64
+
+on:
+  schedule:
+    - cron: '0 2 1 * *' # run at 2 AM UTC on the 1st of each month
+  workflow_dispatch:
+
+jobs:
+  fbneo:
+    name: Build FBNeo
+    runs-on: ubuntu-22.04
+
+    steps:
+    - name: add foreign arch
+      run: |
+        sudo dpkg --add-architecture arm64
+        sudo rm -rf /etc/apt/sources.list
+        # Standard
+        echo "deb [arch=amd64] http://archive.ubuntu.com/ubuntu jammy main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list
+        echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports jammy main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list
+        # Updates
+        echo "deb [arch=amd64] http://archive.ubuntu.com/ubuntu jammy-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list
+        echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports jammy-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list
+        # Security
+        echo "deb [arch=amd64] http://security.ubuntu.com/ubuntu jammy-security main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list
+        echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports jammy-security main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list
+        sudo apt update
+
+    - name: Install needed packages
+      run: sudo apt install -y wget:amd64 git:amd64 build-essential gcc:amd64 make:amd64 g++-aarch64-linux-gnu:amd64 gcc-aarch64-linux-gnu:amd64 binutils-aarch64-linux-gnu:amd64
+
+    - name: Checkout source
+      run: git clone https://github.com/libretro/FBNeo.git && cd FBNeo && git submodule update --init
+
+    - name: Build libretro core
+      working-directory: FBNeo/src/burner/libretro
+      run: |
+        make -j8 CC=/usr/bin/aarch64-linux-gnu-gcc CXX=/usr/bin/aarch64-linux-gnu-g++
+        wget https://raw.githubusercontent.com/libretro/libretro-super/master/retrolink.sh && chmod +x retrolink.sh && ./retrolink.sh fbneo_libretro.so
+        zip -9 ../../../../fbneo_libretro.so.zip fbneo_libretro.so
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: fbneo
+        path: fbneo_libretro.so.zip
+        if-no-files-found: error
+
+  flycast:
+    name: Build Flycast
+    runs-on: ubuntu-22.04
+
+    steps:
+    - name: add foreign arch
+      run: |
+        sudo dpkg --add-architecture arm64
+        sudo rm -rf /etc/apt/sources.list
+        # Standard
+        echo "deb [arch=amd64] http://archive.ubuntu.com/ubuntu jammy main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list
+        echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports jammy main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list
+        # Updates
+        echo "deb [arch=amd64] http://archive.ubuntu.com/ubuntu jammy-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list
+        echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports jammy-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list
+        # Security
+        echo "deb [arch=amd64] http://security.ubuntu.com/ubuntu jammy-security main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list
+        echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports jammy-security main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list
+        sudo apt update
+
+    - name: Install needed packages
+      run: |
+        sudo apt install -y wget:amd64 git:amd64 build-essential gcc:amd64 make:amd64 g++-aarch64-linux-gnu:amd64 gcc-aarch64-linux-gnu:amd64 yasm:amd64 binutils-aarch64-linux-gnu:amd64 libgles-dev:arm64
+
+    - name: Checkout source
+      run: git clone https://github.com/flyinghead/flycast.git && cd flycast && git submodule update --init --recursive
+
+    - name: Build libretro core
+      working-directory: flycast
+      run: |
+        mkdir build && cd build
+        cmake .. -DLIBRETRO=ON -DUSE_GLES=ON -DUSE_GLES2=OFF -DCMAKE_C_COMPILER=/usr/bin/aarch64-linux-gnu-gcc -DCMAKE_CXX_COMPILER=/usr/bin/aarch64-linux-gnu-g++
+        make -j8
+        wget https://raw.githubusercontent.com/libretro/libretro-super/master/retrolink.sh && chmod +x retrolink.sh && ./retrolink.sh flycast_libretro.so
+        zip -9 ../../flycast_libretro.so.zip flycast_libretro.so
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: flycast
+        path: flycast_libretro.so.zip
+        if-no-files-found: error
+
+  release:
+    name: Publish release
+    needs: [fbneo, flycast]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_REPO: ${{ github.repository }}
+
+    steps:
+    - name: Download artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: dist
+        merge-multiple: true
+
+    - name: Create release
+      run: |
+        TAG=$(date -u +%Y.%m.%d)
+        if gh release view "$TAG" > /dev/null 2>&1; then
+          gh release delete "$TAG" --cleanup-tag --yes
+        fi
+        gh release create "$TAG" dist/fbneo_libretro.so.zip dist/flycast_libretro.so.zip \
+          --target "$GITHUB_SHA" \
+          --title "$TAG" \
+          --notes "FBNeo and Flycast built from latest upstream source" \
+          --latest
+
+    - name: Prune old releases
+      run: |
+        gh release list --limit 100 --json tagName,createdAt \
+          --jq 'sort_by(.createdAt) | reverse | .[3:] | .[].tagName' |
+        while read -r tag; do
+          gh release delete "$tag" --cleanup-tag --yes
+        done
